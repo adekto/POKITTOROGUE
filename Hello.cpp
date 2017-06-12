@@ -1,6 +1,8 @@
 #include "Pokitto.h"
 #include <vector>
+#include <string>
 #include "sprites.h"
+
 #include "mapgen.c"
 #include "classes.cpp"
 
@@ -22,6 +24,7 @@ void addDecent(char map[][MAPSIZE]){
 }
 
 Pokitto::Core game;
+
 int playerX = 4;
 int playerY = 4;
 
@@ -46,29 +49,22 @@ char dungeon[MAPSIZE][MAPSIZE];
 #define ID_COINS             20+3
 #define ID_BAG               21+3
 
+#define StateGame  0
+#define StateMenu  1
+#define StateIntro 2
+
+
 //globals
 //std::vector<entity> entities(entities_size);
+std::vector<std::string> inventory = {"axe", "bow", "posion"};
+
 char printer[40] = "";
 int playerGold = 0;
 int playerHP = 100;
+uint8_t GameState = StateGame;
+uint8_t MenuSelector = 0;
+#include "gui.h"
 
-
-void drawHP(int hp){
-    //gui
-        game.display.drawBitmap(212,0,UI1);
-        game.display.drawFastVLine(219,3,158);
-        game.display.drawFastVLine(211,3,158);
-        game.display.drawBitmap(212,162,UI2);
-        int UI_hp = hp * 0.78;
-
-        if(hp >= 0){
-            for(int i = 0; i < UI_hp; i++){
-                game.display.drawBitmap(213,159-(i*2),UI4);
-            }
-            game.display.drawBitmap(213,160-((UI_hp+1)*2),UI3);
-            game.display.drawBitmap(213,161,UI5);
-        }
-}
 using namespace std;
 int main () {
 srand(SEED);
@@ -89,26 +85,43 @@ game.display.setInvisibleColor(0);
 while (game.isRunning()) {
 
     if (game.update()) {
-        if (game.buttons.repeat(BTN_UP,4)){
-            if (!dungeon[playerY-1][playerX]){
-                playerY --;
+        if (game.buttons.held(BTN_C,0)){
+            //doing it this way since more context may happen
+            if(GameState == StateGame){
+                //game.display.rotatePalette(1);
+                GameState = StateMenu;
+            }
+            else if(GameState == StateMenu){
+              //game.display.rotatePalette(-1);
+              GameState = StateGame;
+              MenuSelector = 0;
+              isInventory = false;
             }
         }
-        if (game.buttons.repeat(BTN_DOWN,4)){
-            if (!dungeon[playerY+1][playerX]){
-                playerY ++;
+        if(GameState == StateGame){
+            if (game.buttons.repeat(BTN_UP,4)){
+                if (!dungeon[playerY-1][playerX]){
+                    playerY --;
+                }
+            }
+            if (game.buttons.repeat(BTN_DOWN,4)){
+                if (!dungeon[playerY+1][playerX]){
+                    playerY ++;
+                }
+            }
+            if (game.buttons.repeat(BTN_LEFT,4)){
+                if (!dungeon[playerY][playerX-1]){
+                    playerX --;
+                }
+            }
+            if (game.buttons.repeat(BTN_RIGHT,4)){
+                if (!dungeon[playerY][playerX+1]){
+                    playerX ++;
+                }
             }
         }
-        if (game.buttons.repeat(BTN_LEFT,4)){
-            if (!dungeon[playerY][playerX-1]){
-                playerX --;
-            }
-        }
-        if (game.buttons.repeat(BTN_RIGHT,4)){
-            if (!dungeon[playerY][playerX+1]){
-                playerX ++;
-            }
-        }
+
+
         for(int x =playerX-7; x<playerX+8; x++){ //7
             for(int y =playerY-6; y<playerY+6; y++){
                 if(x >= 0 && y >= 0 && x <MAPSIZE && y < MAPSIZE){
@@ -121,12 +134,16 @@ while (game.isRunning()) {
         game.display.color = 1;
         game.display.print(printer);
 
+        sprintf(printer,"%i",GameState);
 
-
-        drawHP(playerHP);
+        drawHP( playerHP);
         ents[0].draw();
 
         game.display.drawBitmap(14*(7),14*(6),sprites[6]);
+
+        if(GameState == StateMenu){
+            drawMenu( 1,1, MenuSelector,1);
+        }
     }
 
 }
