@@ -18,23 +18,12 @@ void drawHP(int hp){
 bool isInventory = false;
 void drawInv(int x,int y){
     game.display.setFont(fontAdventurer);
-        if (game.buttons.held(BTN_B,0) || game.buttons.held(BTN_LEFT,0)){
-            isInventory = false;
-            MenuSelector = 0;
-        }
-        if (game.buttons.repeat(BTN_UP,4)){
-                if(MenuSelector >0)
-                MenuSelector --;
-        }
-        if (game.buttons.repeat(BTN_DOWN,4)){
-                if(MenuSelector < inventory.size()-1)
-               MenuSelector ++;
-        }
+
 
         game.display.setColor(0);
-        game.display.fillRect(x,y,65,inventory.size()*17+8); //90
+        game.display.fillRect(x,y,84,inventory.size()*17+4); //90
         game.display.setColor(1);
-        game.display.drawRectangle(x,y,65,inventory.size()*17+8);
+        game.display.drawRectangle(x,y,84,inventory.size()*17+4);
 
         game.display.drawBitmap(x+2,y+6+(MenuSelector*17),UIS);
 
@@ -48,6 +37,20 @@ void drawInv(int x,int y){
         for ( int i = 0; i < inventory.size(); i++ ) {
             game.display.setCursor(x+8,y+2+(i*17));
             game.display.print(inventory[i].c_str());
+            game.display.drawBitmap(x+70,y+2+(i*17),sprites[i+34]);
+        }
+
+        if (game.buttons.held(BTN_B,0) || game.buttons.held(BTN_LEFT,0)){
+            isInventory = false;
+            MenuSelector = 0;
+        }
+        if (game.buttons.repeat(BTN_UP,4)){
+                if(MenuSelector >0)
+                MenuSelector --;
+        }
+        if (game.buttons.repeat(BTN_DOWN,4)){
+                if(MenuSelector < inventory.size()-1)
+               MenuSelector ++;
         }
         //inventory.size()
 }
@@ -98,7 +101,7 @@ void drawMenu( int x,int y,int s, int c){
         game.display.color = 1+isInventory;
         game.display.print("items\n  action\n  wait\n  options\n  back");
         if(isInventory){
-            drawInv(65,1);
+            drawInv(13,1);
         }
         else game.display.drawBitmap(x+2,y+6+(s*17),UIS);
         game.display.setFont(font5x7);
