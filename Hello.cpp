@@ -16,7 +16,7 @@ void addDecent(char map[][MAPSIZE]){
     int x=random(1,MAPSIZE-1);
     int y=random(1,MAPSIZE-1);
     if (!solid(map,x,y) && !solid(map,x-1,y) && !solid(map,x+1,y) && !solid(map,x,y-1) && !solid(map,x,y+1)) {
-        map[y][x]=4;
+        map[y][x]=7;
     }
     else {
         addDecent(map);
@@ -134,12 +134,12 @@ while (game.isRunning()) {
         game.display.color = 1;
         game.display.print(printer);
 
-        sprintf(printer,"%i",GameState);
+
 
         drawHP( playerHP);
         ents[0].draw();
 
-        game.display.drawBitmap(14*(7),14*(6),sprites[6]);
+        game.display.drawBitmap(14*(7),14*(6),sprites[8]);
 
         if(GameState == StateMenu){
             drawMenu( 1,1, MenuSelector,1);
