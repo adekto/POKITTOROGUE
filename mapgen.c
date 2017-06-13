@@ -260,7 +260,16 @@ void mappretty(char map[][MAPSIZE],int width, int height){
     for (i=0; i < height-1; i++) {
         for (j=0;j<width-1;j++){
             if (map[i][j]==1 && map[i+1][j]==0){
-                map[i+1][j]=2;
+                if (rand()%10<9) {
+                    map[i+1][j]=2;
+                }
+                else {
+                    map[i+1][j]=3;
+                }
+            }
+
+            if (map[i][j]==0 && map[i+1][j]==1 && map[i][j-1]==1 && rand()%10 <=1) {
+                map[i][j]=26;
             }
         }
     }

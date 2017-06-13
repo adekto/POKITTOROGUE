@@ -6,10 +6,19 @@
 #include "mapgen.c"
 #include "classes.cpp"
 
-#define SEED 32 //Change this value for unique map every time. Hoping for RTC on Hardware!
+#define SEED 344 //Change this value for unique map every time. Hoping for RTC on Hardware!
+
+bool solids[255];
 
 bool solid(char map[][MAPSIZE],int x, int y){
-    return map[y][x]==1 || map[y][x]==2;
+    return solids[map[y][x]];
+}
+
+
+void init_solids(){
+    solids[1]=true;
+    solids[2]=true;
+    solids[3]=true;
 }
 
 void addDecent(char map[][MAPSIZE]){
@@ -67,6 +76,7 @@ uint8_t MenuSelector = 0;
 
 using namespace std;
 int main () {
+init_solids();
 srand(SEED);
 mapinit(dungeon,MAPSIZE,MAPSIZE);
 mapgen(dungeon,MAPSIZE,MAPSIZE,0,0,MAPSIZE-1,MAPSIZE-1);
@@ -100,22 +110,22 @@ while (game.isRunning()) {
         }
         if(GameState == StateGame){
             if (game.buttons.repeat(BTN_UP,4)){
-                if (!dungeon[playerY-1][playerX]){
+                if (!solids[dungeon[playerY-1][playerX]]){
                     playerY --;
                 }
             }
             if (game.buttons.repeat(BTN_DOWN,4)){
-                if (!dungeon[playerY+1][playerX]){
+                if (!solids[dungeon[playerY+1][playerX]]){
                     playerY ++;
                 }
             }
             if (game.buttons.repeat(BTN_LEFT,4)){
-                if (!dungeon[playerY][playerX-1]){
+                if (!solids[dungeon[playerY][playerX-1]]){
                     playerX --;
                 }
             }
             if (game.buttons.repeat(BTN_RIGHT,4)){
-                if (!dungeon[playerY][playerX+1]){
+                if (!solids[dungeon[playerY][playerX+1]]){
                     playerX ++;
                 }
             }
