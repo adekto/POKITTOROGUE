@@ -21,9 +21,9 @@ void drawInv(int x,int y){
 
 
         game.display.setColor(0);
-        game.display.fillRect(x,y,84,inventory.size()*17+4); //90
+        game.display.fillRect(x,y,100,inventory.size()*17+4); //90
         game.display.setColor(1);
-        game.display.drawRectangle(x,y,84,inventory.size()*17+4);
+        game.display.drawRectangle(x,y,100,inventory.size()*17+4);
 
         game.display.drawBitmap(x+2,y+6+(MenuSelector*17),UIS);
 
@@ -37,7 +37,7 @@ void drawInv(int x,int y){
         for ( int i = 0; i < inventory.size(); i++ ) {
             game.display.setCursor(x+8,y+2+(i*17));
             game.display.print(inventory[i].c_str());
-            game.display.drawBitmap(x+70,y+2+(i*17),sprites[i+34]);
+            game.display.drawBitmap(x+86,y+2+(i*17),sprites[i+34]);
         }
 
         if (game.buttons.held(BTN_B,0) || game.buttons.held(BTN_LEFT,0)){
@@ -99,9 +99,9 @@ void drawMenu( int x,int y,int s, int c){
 
         game.display.setCursor(x+8,y+2);
         game.display.color = 1+isInventory;
-        game.display.print("items\n  action\n  wait\n  options\n  back");
+        game.display.print("devs:\n  made\n  for\n  Pokitto\n  back");
         if(isInventory){
-            drawInv(13,1);
+            drawInv(27,1);
         }
         else game.display.drawBitmap(x+2,y+6+(s*17),UIS);
         game.display.setFont(font5x7);

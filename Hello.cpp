@@ -65,7 +65,44 @@ void Ent::draw(){ //Classes are not implemented yet. This wont work either
 
 //globals
 //std::vector<entity> entities(entities_size);
-std::vector<std::string> inventory = {"axe", "bow", "poison"};
+struct entity{
+    uint8_t x;
+    uint8_t y;
+    int8_t hp;
+    uint8_t id;
+};
+#define ESIZE 2
+std::vector<entity> entities(ESIZE);
+std::vector<std::string> inventory = {"adekto", "trelemar", "VonBednar","wuuff"};
+void removeEntity(int i){
+
+        using std::swap;
+         std::swap(entities[i], entities.back());
+    entities.pop_back();
+
+}
+
+void spawner(int amount){
+    entities.clear();
+    for(int i = 0; i < amount; i++ ){
+        entity spawn;
+        bool l = true;
+        int sx, sy;
+        while(l){
+            sx = rand()%dungeonSize;
+            sy = rand()%dungeonSize;
+            if(dungeon[sy][sx] == 0){
+                spawn.id = rand()%8+12;
+                spawn.x = sx;
+                spawn.y = sy;
+                spawn.hp = rand()%20;
+                entities.push_back(spawn);
+                l = false;
+            }
+        }
+    }
+}
+
 
 char printer[40] = "";
 int playerGold = 0;
@@ -73,7 +110,7 @@ int playerHP = 100;
 uint8_t GameState = StateGame;
 uint8_t MenuSelector = 0;
 #include "gui.h"
-
+#include "crapai.h"
 using namespace std;
 int main () {
 init_solids();
@@ -91,6 +128,11 @@ game.display.loadRGBPalette(paletteCGA);
 //game.display.persistence = true;
 game.display.setInvisibleColor(0);
 
+spawner(ESIZE);
+entities[0].id = 12;
+entities[0].x = 5;
+entities[0].y = 5;
+entities[0].hp = rand()%20;
 
 while (game.isRunning()) {
 
@@ -107,6 +149,7 @@ while (game.isRunning()) {
             mapgen(dungeon,dungeonSize,dungeonSize,0,0,dungeonSize-1,dungeonSize-1);
             mappretty(dungeon,dungeonSize,dungeonSize);
             addDescent(dungeon);
+            spawner(ESIZE);
         }
 
         if (game.buttons.held(BTN_C,0)){
@@ -125,22 +168,22 @@ while (game.isRunning()) {
         if(GameState == StateGame){
             if (game.buttons.repeat(BTN_UP,4)){
                 if (!solids[dungeon[playerY-1][playerX]]){
-                    playerY --;
+                    if(entitiesLogic( playerX, playerY-1)) playerY --;
                 }
             }
             if (game.buttons.repeat(BTN_DOWN,4)){
                 if (!solids[dungeon[playerY+1][playerX]]){
-                    playerY ++;
+                    if(entitiesLogic( playerX, playerY+1)) playerY ++;
                 }
             }
             if (game.buttons.repeat(BTN_LEFT,4)){
                 if (!solids[dungeon[playerY][playerX-1]]){
-                    playerX --;
+                    if(entitiesLogic( playerX-1, playerY))playerX --;
                 }
             }
             if (game.buttons.repeat(BTN_RIGHT,4)){
                 if (!solids[dungeon[playerY][playerX+1]]){
-                    playerX ++;
+                    if(entitiesLogic( playerX+1, playerY))playerX ++;
                 }
             }
         }
@@ -152,6 +195,12 @@ while (game.isRunning()) {
                     game.display.drawBitmap(14*(x-playerX+7),14*(y-playerY+6),sprites[dungeon[y][x]]);
                 }
             }
+        }
+
+        for(int i=0; i<entities.size(); ++i){
+            game.display.color = 0; //remove before release
+            game.display.fillRect(14*(entities[i].x-playerX+7),14*(entities[i].y-playerY+6),14,14);//remove and fix before release
+            game.display.drawBitmap(14*(entities[i].x-playerX+7),14*(entities[i].y-playerY+6),sprites[entities[i].id]);
         }
 
         game.display.setCursor(0,168);
