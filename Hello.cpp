@@ -10,10 +10,12 @@
 
 bool solids[255];
 
+char dungeon[MAPSIZE][MAPSIZE];
+int dungeonSize = 16;//Starting dungeon size, which increases each level
+
 bool solid(char map[][MAPSIZE],int x, int y){
     return solids[map[y][x]];
 }
-
 
 void init_solids(){
     solids[1]=true;
@@ -21,28 +23,26 @@ void init_solids(){
     solids[3]=true;
 }
 
-void addDecent(char map[][MAPSIZE]){
-    int x=random(1,MAPSIZE-1);
-    int y=random(1,MAPSIZE-1);
+void addDescent(char map[][MAPSIZE]){
+    int x=random(1,dungeonSize-1);
+    int y=random(1,dungeonSize-1);
     if (!solid(map,x,y) && !solid(map,x-1,y) && !solid(map,x+1,y) && !solid(map,x,y-1) && !solid(map,x,y+1)) {
         map[y][x]=7;
     }
     else {
-        addDecent(map);
+        addDescent(map);
     }
 }
 
 Pokitto::Core game;
 
-int playerX = 4;
-int playerY = 4;
+int playerX = 1;
+int playerY = 2;
 
 
 void Ent::draw(){ //Classes are not implemented yet. This wont work either
     game.display.drawBitmap(playerX-x*14,playerY-y*14,sprites[id]);
 }
-
-char dungeon[MAPSIZE][MAPSIZE];
 
 #define ID_SKELETON_MAGE     9+3
 #define ID_SKELETON_ARCHER   10+3
@@ -65,7 +65,7 @@ char dungeon[MAPSIZE][MAPSIZE];
 
 //globals
 //std::vector<entity> entities(entities_size);
-std::vector<std::string> inventory = {"axe", "bow", "posion"};
+std::vector<std::string> inventory = {"axe", "bow", "poison"};
 
 char printer[40] = "";
 int playerGold = 0;
@@ -78,10 +78,10 @@ using namespace std;
 int main () {
 init_solids();
 srand(SEED);
-mapinit(dungeon,MAPSIZE,MAPSIZE);
-mapgen(dungeon,MAPSIZE,MAPSIZE,0,0,MAPSIZE-1,MAPSIZE-1);
-mappretty(dungeon,MAPSIZE,MAPSIZE);
-addDecent(dungeon);
+mapinit(dungeon,dungeonSize,dungeonSize);
+mapgen(dungeon,dungeonSize,dungeonSize,0,0,dungeonSize-1,dungeonSize-1);
+mappretty(dungeon,dungeonSize,dungeonSize);
+addDescent(dungeon);
 std::vector<Ent> ents;
 ents.push_back(Ent{3,3});
 game.begin();
@@ -95,6 +95,20 @@ game.display.setInvisibleColor(0);
 while (game.isRunning()) {
 
     if (game.update()) {
+
+        //If the player is standing on stairs down, generate a new bigger map
+        if( dungeon[playerY][playerX] == 7 ){
+            if( dungeonSize + 2 < MAPSIZE ){ //As long as we aren't at maximum size
+                dungeonSize += 2;//Increase map x and y by 2
+            }
+            playerX = 1;
+            playerY = 2;
+            mapinit(dungeon,dungeonSize,dungeonSize);
+            mapgen(dungeon,dungeonSize,dungeonSize,0,0,dungeonSize-1,dungeonSize-1);
+            mappretty(dungeon,dungeonSize,dungeonSize);
+            addDescent(dungeon);
+        }
+
         if (game.buttons.held(BTN_C,0)){
             //doing it this way since more context may happen
             if(GameState == StateGame){
@@ -134,7 +148,7 @@ while (game.isRunning()) {
 
         for(int x =playerX-7; x<playerX+8; x++){ //7
             for(int y =playerY-6; y<playerY+6; y++){
-                if(x >= 0 && y >= 0 && x <MAPSIZE && y < MAPSIZE){
+                if(x >= 0 && y >= 0 && x < dungeonSize && y < dungeonSize){
                     game.display.drawBitmap(14*(x-playerX+7),14*(y-playerY+6),sprites[dungeon[y][x]]);
                 }
             }

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAPSIZE 32
+#define MAPSIZE 64
+
+#define COBWEB 26
 
 void mapinit(char map[][MAPSIZE], int width, int height);
 void mapgen(char map[][MAPSIZE], int mapwidth, int mapheight, int startx, int starty, int endx, int endy);
@@ -10,6 +12,12 @@ void mapprint(char map[][MAPSIZE], int width, int height);
 void mapinit(char map[][MAPSIZE], int width, int height){
     int i,j;
 
+    //Fill with empty space
+    for( i = 0; i < width; i++ ){
+        for( j = 0; j < height; j++ ){
+            map[j][i] = 0;
+        }
+    }
     //Generate walls around the edges
     for( i = 0; i < width; i++ ){
         map[0][i] = 1;
@@ -269,7 +277,7 @@ void mappretty(char map[][MAPSIZE],int width, int height){
             }
 
             if (map[i][j]==0 && map[i+1][j]==1 && map[i][j-1]==1 && rand()%10 <=1) {
-                map[i][j]=26;
+                map[i][j]=COBWEB;
             }
         }
     }
