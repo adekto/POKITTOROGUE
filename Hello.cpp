@@ -23,17 +23,6 @@ void init_solids(){
     solids[3]=true;
 }
 
-void addDescent(char map[][MAPSIZE]){
-    int x=random(1,dungeonSize-1);
-    int y=random(1,dungeonSize-1);
-    if (!solid(map,x,y) && !solid(map,x-1,y) && !solid(map,x+1,y) && !solid(map,x,y-1) && !solid(map,x,y+1)) {
-        map[y][x]=7;
-    }
-    else {
-        addDescent(map);
-    }
-}
-
 Pokitto::Core game;
 
 int playerX = 1;
@@ -44,24 +33,43 @@ void Ent::draw(){ //Classes are not implemented yet. This wont work either
     game.display.drawBitmap(playerX-x*14,playerY-y*14,sprites[id]);
 }
 
-#define ID_SKELETON_MAGE     9+3
-#define ID_SKELETON_ARCHER   10+3
-#define ID_SKELETON_WARIOR   11+3
-#define ID_BLOOD_SKELETON    12+3
-#define ID_BLOOD             13+3
-#define ID_RAT               14+3
-#define ID_SCROLL            15+3
-#define ID_CHEST             16+3
-#define ID_CHEST_OPEN        17+3
-#define ID_MIMIC             18+3
-#define ID_COIN              19+3
-#define ID_COINS             20+3
-#define ID_BAG               21+3
+#define MAP_TILES 0
+#define ITEM_TILES (MAP_TILES + 34)
+#define ENTITY_TILES (ITEM_TILES + 36)
+
+#define ID_PLAYER            ENTITY_TILES + 2
+
+#define ID_STAIRS_DOWN       MAP_TILES + 19
+#define ID_GOBLIN_WARRIOR    ENTITY_TILES + 5
+#define ID_GOBLIN_MAGE       ENTITY_TILES + 6
+#define ID_SKELETON_MAGE     ENTITY_TILES + 7
+#define ID_SKELETON_ARCHER   ENTITY_TILES + 8
+#define ID_SKELETON_WARIOR   ENTITY_TILES + 9
+#define ID_BLOOD_SKELETON    ENTITY_TILES + 10
+#define ID_BLOOD             ENTITY_TILES + 11
+#define ID_RAT               ENTITY_TILES + 4
+#define ID_SCROLL            ITEM_TILES + 3
+#define ID_CHEST             ENTITY_TILES + 12
+#define ID_CHEST_OPEN        ENTITY_TILES + 13
+#define ID_MIMIC             ENTITY_TILES + 14
+#define ID_COIN              ITEM_TILES
+#define ID_COINS             ITEM_TILES + 1
+#define ID_BAG               ITEM_TILES + 2
 
 #define StateGame  0
 #define StateMenu  1
 #define StateIntro 2
 
+void addDescent(char map[][MAPSIZE]){
+    int x=random(1,dungeonSize-1);
+    int y=random(1,dungeonSize-1);
+    if (!solid(map,x,y) && !solid(map,x-1,y) && !solid(map,x+1,y) && !solid(map,x,y-1) && !solid(map,x,y+1)) {
+        map[y][x] = ID_STAIRS_DOWN;
+    }
+    else {
+        addDescent(map);
+    }
+}
 
 //globals
 //std::vector<entity> entities(entities_size);
@@ -92,7 +100,7 @@ void spawner(int amount){
             sx = rand()%dungeonSize;
             sy = rand()%dungeonSize;
             if(dungeon[sy][sx] == 0){
-                spawn.id = rand()%8+12;
+                spawn.id = rand()%8+ENTITY_TILES+4;//Skip first few entities for now
                 spawn.x = sx;
                 spawn.y = sy;
                 spawn.hp = rand()%20;
@@ -129,17 +137,17 @@ game.display.loadRGBPalette(paletteCGA);
 game.display.setInvisibleColor(0);
 
 spawner(ESIZE);
-entities[0].id = 12;
+/*entities[0].id = 12;
 entities[0].x = 5;
 entities[0].y = 5;
-entities[0].hp = rand()%20;
+entities[0].hp = rand()%20;*/
 
 while (game.isRunning()) {
 
     if (game.update()) {
 
         //If the player is standing on stairs down, generate a new bigger map
-        if( dungeon[playerY][playerX] == 7 ){
+        if( dungeon[playerY][playerX] == ID_STAIRS_DOWN ){
             if( dungeonSize + 2 < MAPSIZE ){ //As long as we aren't at maximum size
                 dungeonSize += 2;//Increase map x and y by 2
             }
@@ -212,7 +220,7 @@ while (game.isRunning()) {
         drawHP( playerHP);
         ents[0].draw();
 
-        game.display.drawBitmap(14*(7),14*(6),sprites[8]);
+        game.display.drawBitmap(14*(7),14*(6),sprites[ID_PLAYER]);
 
         if(GameState == StateMenu){
             drawMenu( 1,1, MenuSelector,1);

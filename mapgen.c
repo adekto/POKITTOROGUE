@@ -3,7 +3,14 @@
 
 #define MAPSIZE 64
 
-#define COBWEB 26
+#define ID_FLOOR 0
+#define ID_WALL_TOP 1
+#define ID_WALL 2
+#define ID_WALL_SKULL 3
+#define ID_WALL_FLAME 4
+#define ID_WALL_HOLE 5
+#define ID_WALL_SHIELD 6
+#define ID_COBWEB 33
 
 void mapinit(char map[][MAPSIZE], int width, int height);
 void mapgen(char map[][MAPSIZE], int mapwidth, int mapheight, int startx, int starty, int endx, int endy);
@@ -264,20 +271,21 @@ void mapprint(char map[][MAPSIZE], int width, int height){
 }
 
 void mappretty(char map[][MAPSIZE],int width, int height){
-    int i,j;
+    int i,j,v;
     for (i=0; i < height-1; i++) {
         for (j=0;j<width-1;j++){
             if (map[i][j]==1 && map[i+1][j]==0){
-                if (rand()%10<9) {
-                    map[i+1][j]=2;
-                }
-                else {
-                    map[i+1][j]=3;
+                v = rand()%25 + 3;
+                //If v is any of the random wall variations
+                if( v <= ID_WALL_SHIELD ){
+                    map[i+1][j] = v;
+                }else {
+                    map[i+1][j]=ID_WALL;
                 }
             }
 
             if (map[i][j]==0 && map[i+1][j]==1 && map[i][j-1]==1 && rand()%10 <=1) {
-                map[i][j]=COBWEB;
+                map[i][j]=ID_COBWEB;
             }
         }
     }

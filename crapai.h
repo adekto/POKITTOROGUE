@@ -31,6 +31,8 @@ bool entitiesLogic(int playerX, int playerY){
             break;
         case ID_BLOOD_SKELETON:
         case ID_RAT:
+        case ID_GOBLIN_WARRIOR:
+        case ID_GOBLIN_MAGE:
         case ID_SKELETON_MAGE:
         case ID_SKELETON_ARCHER:
         case ID_SKELETON_WARIOR:
@@ -61,6 +63,12 @@ bool entitiesLogic(int playerX, int playerY){
                         break;
                     case ID_RAT:
                         sprintf(printer,"hit giant rat, hp: %i",  entities[i].hp);
+                        break;
+                    case ID_GOBLIN_WARRIOR:
+                        sprintf(printer,"hit goblin warrior, hp: %i",  entities[i].hp);
+                        break;
+                    case ID_GOBLIN_MAGE:
+                        sprintf(printer,"hit goblin mage, hp: %i",  entities[i].hp);
                         break;
                     case ID_SKELETON_MAGE:
                         sprintf(printer,"hit skeleton mage, hp: %i",  entities[i].hp);
