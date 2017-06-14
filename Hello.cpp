@@ -18,9 +18,8 @@ bool solid(char map[][MAPSIZE],int x, int y){
 }
 
 void init_solids(){
-    solids[1]=true;
-    solids[2]=true;
-    solids[3]=true;
+    for( int i = 1; i <= ID_COFFIN_OPEN_BOTTOM; i++ )
+        solids[i]=true;
 }
 
 Pokitto::Core game;

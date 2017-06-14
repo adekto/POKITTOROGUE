@@ -10,6 +10,18 @@
 #define ID_WALL_FLAME 4
 #define ID_WALL_HOLE 5
 #define ID_WALL_SHIELD 6
+#define ID_COLUMN_TOP_SQUARE_1 7
+#define ID_COLUMN_TOP_SQUARE_2 9
+#define ID_COLUMN_TOP_SQUARE_3 10
+#define ID_COLUMN_TOP_ROUND_1 11
+#define ID_COLUMN_TOP_ROUND_2 13
+#define ID_COLUMN_BOTTOM_SQUARE_1 8
+#define ID_COLUMN_BOTTOM_ROUND_1 12
+#define ID_COLUMN_BOTTOM_ROUND_2 14
+#define ID_COFFIN_CLOSED_TOP 15
+#define ID_COFFIN_CLOSED_BOTTOM 16
+#define ID_COFFIN_OPEN_TOP 17
+#define ID_COFFIN_OPEN_BOTTOM 18
 #define ID_COBWEB 33
 
 void mapinit(char map[][MAPSIZE], int width, int height);
@@ -62,6 +74,7 @@ void mapgen(char map[][MAPSIZE], int mapwidth, int mapheight, int startx, int st
     if( width >= MIN_HALL_WIDTH && height >= MIN_HALL_HEIGHT && width < MAX_HALL_WIDTH && height < MAX_HALL_HEIGHT ){
         hall = rand()%100;//Percent chance out of 100
         if( HALL_CHANCE > hall ){
+            hall = rand()%3;//Choose type of hall; square columns, round columns, or coffins
             //Place room columns as densely as the room supports
             //IF you can divide the room into columns evenly
             //but make sure there is greater than one space between columns
@@ -79,7 +92,49 @@ void mapgen(char map[][MAPSIZE], int mapwidth, int mapheight, int startx, int st
 
             for( i = startx+colspacex; i < startx + width - 1; i+=colspacex ){
                 for( j = starty+colspacey; j < starty + height - 2; j+=colspacey ){
-                    map[j][i] = 1;
+                    if( hall == 0 ){//Square columns
+                        switch( rand()%3 ){
+                            case 0:
+                                map[j][i] = ID_COLUMN_TOP_SQUARE_1;
+                                break;
+                            case 1:
+                                map[j][i] = ID_COLUMN_TOP_SQUARE_2;
+                                break;
+                            case 2:
+                                map[j][i] = ID_COLUMN_TOP_SQUARE_3;
+                                break;
+                        }
+                        map[j+1][i] = ID_COLUMN_BOTTOM_SQUARE_1;
+                    }else if( hall == 1 ){//Round columns
+                        switch( rand()%2 ){
+                            case 0:
+                                map[j][i] = ID_COLUMN_TOP_ROUND_1;
+                                break;
+                            case 1:
+                                map[j][i] = ID_COLUMN_TOP_ROUND_2;
+                                break;
+                        }
+                        switch( rand()%2 ){
+                            case 0:
+                                map[j+1][i] = ID_COLUMN_BOTTOM_ROUND_1;
+                                break;
+                            case 1:
+                                map[j+1][i] = ID_COLUMN_BOTTOM_ROUND_2;
+                                break;
+                        }
+                    }else{//Coffins
+                        switch( rand()%2 ){
+                            case 0:
+                                map[j][i] = ID_COFFIN_CLOSED_TOP;
+                                map[j+1][i] = ID_COFFIN_CLOSED_BOTTOM;
+                                break;
+                            case 1:
+                                map[j][i] = ID_COFFIN_OPEN_TOP;
+                                map[j+1][i] = ID_COFFIN_OPEN_BOTTOM;
+                                break;
+                        }
+                    }
+
                 }
             }
             return;//Do not subdivide; return immediately
