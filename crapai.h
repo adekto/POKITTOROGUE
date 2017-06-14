@@ -2,6 +2,12 @@ bool colide(int id, int x, int y, bool c){
     if (entities[id].x == x && entities[id].y == y) return false;
     else return c;
 }
+bool bonycolide(int x, int y){
+	for(int i=0; i<entities.size(); ++i){
+		if (entities[i].x == x && entities[i].y == y) return false;
+	}
+	return true;
+}
 bool entitiesLogic(int playerX, int playerY){
     bool nocolide = true;
 
@@ -29,6 +35,12 @@ bool entitiesLogic(int playerX, int playerY){
 
 
             break;
+        case ENTITY_TILES + 15:
+        case ENTITY_TILES + 16:
+        case ENTITY_TILES + 17:
+        case ENTITY_TILES + 18:
+        case ENTITY_TILES + 19:
+        case ENTITY_TILES + 20:
         case ID_BLOOD_SKELETON:
         case ID_RAT:
         case ID_GOBLIN_WARRIOR:
@@ -39,19 +51,28 @@ bool entitiesLogic(int playerX, int playerY){
         case ID_MIMIC:
             nocolide = colide(i,playerX,playerY,nocolide); //its wierd but works
             if(entities[i].x > playerX && colide(i,playerX+1,playerY,true)){
-                if (!solids[dungeon[entities[i].y][entities[i].x-1]]) entities[i].x-=1;}
+                if (!solids[dungeon[entities[i].y][entities[i].x-1]]){
+                	if(bonycolide(entities[i].x-1, entities[i].y)) entities[i].x-=1;}
+                }
             else if(!colide(i,playerX+1,playerY,true)) playerHP -=10;
 
             if(entities[i].x < playerX && colide(i,playerX-1,playerY,true)){
-                if (!solids[dungeon[entities[i].y][entities[i].x+1]]) entities[i].x+=1;}
+                if (!solids[dungeon[entities[i].y][entities[i].x+1]]){
+                	if(bonycolide(entities[i].x+1, entities[i].y)) entities[i].x+=1;}
+                }
             else if(!colide(i,playerX-1,playerY,true)) playerHP -=10;
 
             if(entities[i].y > playerY && colide(i,playerX,playerY+1,true)){
-                if (!solids[dungeon[entities[i].y-1][entities[i].x]]) entities[i].y-=1;}
+                if (!solids[dungeon[entities[i].y-1][entities[i].x]])
+                {
+                	if(bonycolide(entities[i].x, entities[i].y-1)) entities[i].y-=1;}
+                }
             else if(!colide(i,playerX,playerY+1,true)) playerHP -=10;
 
             if(entities[i].y < playerY && colide(i,playerX,playerY-1,true)){
-                if (!solids[dungeon[entities[i].y+1][entities[i].x]]) entities[i].y+=1;}
+                if (!solids[dungeon[entities[i].y+1][entities[i].x]]){
+                	if(bonycolide(entities[i].x, entities[i].y+1)) entities[i].y+=1;}
+                }
             else if(!colide(i,playerX,playerY-1,true)) playerHP -=10;
 
             if(!colide(i,playerX,playerY,true)){
@@ -82,12 +103,36 @@ bool entitiesLogic(int playerX, int playerY){
                     case ID_MIMIC:
                         sprintf(printer,"hit mimic, hp: %i",  entities[i].hp);
                         break;
+                    case ENTITY_TILES + 15:
+                        sprintf(printer,"hit zombie, hp: %i",  entities[i].hp);
+                        break;
+                    case ENTITY_TILES + 16:
+                        sprintf(printer,"hit bloated zombie, hp: %i",  entities[i].hp);
+                        break;
+                    case ENTITY_TILES + 17:
+                        sprintf(printer,"hit fog, hp: %i",  entities[i].hp);
+                        break;
+                    case ENTITY_TILES + 18:
+                        sprintf(printer,"hit spirit, hp: %i",  entities[i].hp);
+                        break;
+                    case ENTITY_TILES + 19:
+                        sprintf(printer,"hit spawn, hp: %i",  entities[i].hp);
+                        break;
+                    case ENTITY_TILES + 20:
+                        sprintf(printer,"hit giant worm, hp: %i",  entities[i].hp);
+                        break;
                 }
                 if(entities[i].hp <= 0 && entities[i].id == ID_BLOOD_SKELETON){
                     entities[i].id = ID_BLOOD;
                     entities[i].hp = rand()%5;
                 }
-                else if(entities[i].hp <= 0) removeEntity(i);
+                else if(entities[i].hp <= 0){
+
+                    int tpgold = rand()%5;
+                    playerGold += tpgold;
+                    sprintf(printer,"killed enemy, gained %i gold",  tpgold);
+                    removeEntity(i);
+                }
 
             }
             break;

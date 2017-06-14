@@ -101,7 +101,7 @@ void spawner(int amount){
             sx = rand()%dungeonSize;
             sy = rand()%dungeonSize;
             if(dungeon[sy][sx] == 0){
-                spawn.id = rand()%8+ENTITY_TILES+4;//Skip first few entities for now
+                spawn.id = ENTITY_TILES+4+(rand()%16);//rand()%8+ENTITY_TILES+4;//Skip first few entities for now
                 spawn.x = sx;
                 spawn.y = sy;
                 spawn.hp = rand()%20;
@@ -161,10 +161,12 @@ while (game.isRunning()) {
         if( GameState == StateDead){
             game.display.setFont(fontAdventurer);
             game.display.setCursor(game.display.getWidth()/4,32);
-            game.display.print("Game Over \n \n   You died on floor: ");
-            game.display.print(dungeonDepth);
-            game.display.print("\n \n   You made it to year: ");
-            game.display.print("ERR");//Not implemented
+            char * over;
+            sprintf(over,"Game Over \n \n   You died on floor %i \n \n   with %i gold",dungeonDepth,playerGold);
+            game.display.print(over);
+            //game.display.print(dungeonDepth);
+            //game.display.print("\n \n   You made it to year: ");
+            //game.display.print("ERR");//Not implemented
             game.display.print("\n \n   PRESS A");
             if( game.buttons.held(BTN_A,0) ){
                 GameState = StateIntro;
