@@ -247,7 +247,7 @@ void Simulator::quit() {
 }
 
 int Simulator::isRunning() {
-    refreshDisplay();
+    //refreshDisplay(); //<-- cause for crash in Windows! *jonne
     return simRunning;
 }
 
