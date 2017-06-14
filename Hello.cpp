@@ -131,6 +131,7 @@ addDescent(dungeon);
 std::vector<Ent> ents;
 ents.push_back(Ent{3,3});
 game.begin();
+game.sound.playMusicStream("COFFINS.SND");
 //mapgen(0,0,0,20,20);
 game.display.loadRGBPalette(paletteCGA);
 //game.display.setFont(fontAdventurer);
