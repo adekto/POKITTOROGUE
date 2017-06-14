@@ -12,6 +12,7 @@ bool solids[255];
 
 char dungeon[MAPSIZE][MAPSIZE];
 int dungeonSize = 16;//Starting dungeon size, which increases each level
+int dungeonDepth = 1;//Which floor the player is on
 
 bool solid(char map[][MAPSIZE],int x, int y){
     return solids[map[y][x]];
@@ -58,6 +59,7 @@ void Ent::draw(){ //Classes are not implemented yet. This wont work either
 #define StateGame  0
 #define StateMenu  1
 #define StateIntro 2
+#define StateDead  3
 
 void addDescent(char map[][MAPSIZE]){
     int x=random(1,dungeonSize-1);
@@ -114,7 +116,7 @@ void spawner(int amount){
 char printer[40] = "";
 int playerGold = 0;
 int playerHP = 100;
-uint8_t GameState = StateGame;
+uint8_t GameState = StateIntro;
 uint8_t MenuSelector = 0;
 #include "gui.h"
 #include "crapai.h"
@@ -145,11 +147,48 @@ while (game.isRunning()) {
 
     if (game.update()) {
 
+        if( GameState == StateIntro){
+            game.display.setFont(fontAdventurer);
+            game.display.setCursor(game.display.getWidth()/4-16,32);
+            game.display.print("Columns & Coffins \n \n   A Pokitto Roguelike \n \n   PRESS A");
+            if( game.buttons.held(BTN_A,0) ){
+                GameState = StateGame;
+            }
+            game.display.setFont(font5x7);
+            continue;
+        }
+
+        if( GameState == StateDead){
+            game.display.setFont(fontAdventurer);
+            game.display.setCursor(game.display.getWidth()/4,32);
+            game.display.print("Game Over \n \n   You died on floor: ");
+            game.display.print(dungeonDepth);
+            game.display.print("\n \n   You made it to year: ");
+            game.display.print("ERR");//Not implemented
+            game.display.print("\n \n   PRESS A");
+            if( game.buttons.held(BTN_A,0) ){
+                GameState = StateIntro;
+                dungeonSize = 16;
+                dungeonDepth = 1;
+                playerHP = 100;
+                playerX = 1;
+                playerY = 2;
+                mapinit(dungeon,dungeonSize,dungeonSize);
+                mapgen(dungeon,dungeonSize,dungeonSize,0,0,dungeonSize-1,dungeonSize-1);
+                mappretty(dungeon,dungeonSize,dungeonSize);
+                addDescent(dungeon);
+                spawner(ESIZE);
+            }
+            game.display.setFont(font5x7);
+            continue;
+        }
+
         //If the player is standing on stairs down, generate a new bigger map
         if( dungeon[playerY][playerX] == ID_STAIRS_DOWN ){
             if( dungeonSize + 2 < MAPSIZE ){ //As long as we aren't at maximum size
                 dungeonSize += 2;//Increase map x and y by 2
             }
+            dungeonDepth++;
             playerX = 1;
             playerY = 2;
             mapinit(dungeon,dungeonSize,dungeonSize);
@@ -173,6 +212,11 @@ while (game.isRunning()) {
             }
         }
         if(GameState == StateGame){
+            if( playerHP <= 0){
+                GameState = StateDead;
+                continue;
+            }
+
             if (game.buttons.repeat(BTN_UP,4)){
                 if (!solids[dungeon[playerY-1][playerX]]){
                     if(entitiesLogic( playerX, playerY-1)) playerY --;
