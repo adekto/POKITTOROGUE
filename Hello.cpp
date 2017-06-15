@@ -213,6 +213,7 @@ while (game.isRunning()) {
             mappretty(dungeon,dungeonSize,dungeonSize);
             addDescent(dungeon);
             spawner(ESIZE);
+            game.wait(500);
         }
 
         if (game.buttons.held(BTN_C,0)){
