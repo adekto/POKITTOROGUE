@@ -133,6 +133,7 @@ ents.push_back(Ent{3,3});
 game.begin();
 game.sound.playMusicStream("COFFINS.SND");
 //mapgen(0,0,0,20,20);
+
 game.display.loadRGBPalette(paletteCGA);
 //game.display.setFont(fontAdventurer);
 //game.display.persistence = true;
@@ -144,25 +145,38 @@ entities[0].x = 5;
 entities[0].y = 5;
 entities[0].hp = rand()%20;*/
 
+uint8_t introspinner=0xFF;
+
 while (game.isRunning()) {
 
     if (game.update()) {
 
         if( GameState == StateIntro){
-            game.display.setFont(fontAdventurer);
-            game.display.setCursor(game.display.getWidth()/4-16,32);
-            game.display.print("Columns & Coffins \n \n   A Pokitto Roguelike \n \n   PRESS A");
+            if (introspinner<85) {
+                game.display.setFont(fontAdventurer);
+                game.display.setCursor(game.display.getWidth()/4-16,36);
+                game.display.print("Columns & Coffins \n \n         A Pokitto Roguelike \n \n          PRESS A(z)");
+                game.display.setFont(font5x7);
+            } else if (introspinner>160) {
+                game.display.load565Palette(cnctitle_pal);
+                game.display.drawBitmap(0,0,cnctitle);
+            } else {
+                game.display.loadRGBPalette(paletteCGA);
+                game.display.drawBitmap(33,70,pokitteam);
+            }
             if( game.buttons.held(BTN_A,0) ){
+                game.display.loadRGBPalette(paletteCGA);
                 GameState = StateGame;
             }
-            game.display.setFont(font5x7);
+            introspinner--;
             continue;
         }
 
         if( GameState == StateDead){
             game.display.setFont(fontAdventurer);
             game.display.setCursor(game.display.getWidth()/4,32);
-            char * over;
+            char over[60];
+
             sprintf(over,"Game Over \n \n   You died on floor %i \n \n   with %i gold",dungeonDepth,playerGold);
             game.display.print(over);
             //game.display.print(dungeonDepth);
